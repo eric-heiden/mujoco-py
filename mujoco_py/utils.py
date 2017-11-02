@@ -48,10 +48,30 @@ def discover_mujoco():
     Discovers where MuJoCo is located in the file system.
     Currently assumes path is in ~/.mujoco
 
+    The key file is searched in the following order:
+    1. Try to find it at the path defined by a MUJOCO_KEY_FILE
+       environment variable.
+    2. Use the $HOME/.mujoco directory to find a mjkey.txt.
+
+    The MuJoCo path (version) is searched as follows:
+    1. Try to find it at the path defined by a MUJOCO_PATH
+       environment variable.
+    2. Use the $HOME/.mujoco/mjpro150 directory.
+
     Returns:
     - mjpro_path (str): Path to MuJoCo Pro 1.50 directory.
     - key_path (str): Path to the MuJoCo license key.
     """
-    key_path = join(expanduser('~'), '.mujoco', 'mjkey.txt')
-    mjpro_path = join(expanduser('~'), '.mujoco', 'mjpro150')
+    import os
+
+    if 'MUJOCO_KEY_FILE' in os.environ and len(os.environ['MUJOCO_KEY_FILE']) > 2:
+        key_path = os.environ['MUJOCO_KEY_FILE']
+    else:
+        key_path = join(expanduser('~'), '.mujoco', 'mjkey.txt')
+
+    if 'MUJOCO_PATH' in os.environ and len(os.environ['MUJOCO_PATH']) > 2:
+        mjpro_path = os.environ['MUJOCO_PATH']
+    else:
+        mjpro_path = join(expanduser('~'), '.mujoco', 'mjpro150')
+
     return (mjpro_path, key_path)
